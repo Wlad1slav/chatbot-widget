@@ -10,10 +10,12 @@ import ChatbotMessage from "./components/chatbot-message"
 import TypingIndicator from "./components/typing-indicator"
 import { placeholderMessages } from "./utils/placeholders"
 import { getStyle } from "./utils/styles"
+import NotificationBadge from "./components/notification-badge"
 
-export default function ChatbotWidget({ theme = 'boring', placeholder = false }: {
+export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true }: {
   theme?: Theme,
-  placeholder?: boolean
+  placeholder?: boolean,
+  notificationBadge?: boolean,
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(placeholder ? placeholderMessages : [])
@@ -130,12 +132,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false }:
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </button>
 
-      {/* Notification Badge */}
-      {!isOpen && (
-        <div className="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center animate-pulse">
-          <span className="text-white text-xs font-bold">3</span>
-        </div>
-      )}
+      {(!isOpen && notificationBadge)&& ( <NotificationBadge /> )}
     </div>
   )
 }

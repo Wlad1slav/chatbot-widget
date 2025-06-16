@@ -1,7 +1,6 @@
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
-import { MessageCircle, X, Send } from "lucide-react"
 
 import "./widget.css"
 import ChatbotHeader from "./components/chatbot-header"
@@ -11,6 +10,8 @@ import TypingIndicator from "./components/typing-indicator"
 import { placeholderMessages } from "./utils/placeholders"
 import { getStyle } from "./utils/styles"
 import NotificationBadge from "./components/notification-badge"
+import ChatbotInput from "./components/chatbot-input"
+import ChatbotOpenButton from "./components/chatbot-open-btn"
 
 export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true }: {
   theme?: Theme,
@@ -99,20 +100,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
       </div>
 
       {/* Chat Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-          w-14 h-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700
-          rounded-full shadow-2xl flex items-center justify-center text-white
-          transition-all duration-300 transform hover:scale-110 active:scale-95
-          ${isOpen ? "rotate-180" : "rotate-0"}
-        `}
-        style={{
-          boxShadow: "0 0 30px rgba(147, 51, 234, 0.5)",
-        }}
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-      </button>
+      <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} />
 
       {(!isOpen && notificationBadge)&& ( <NotificationBadge /> )}
     </div>

@@ -157,7 +157,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
             {/* Prompts, suggestions */}
             {showPrompts && <div className="flex gap-2 flex-wrap">
               {prompts.map(prompt => (
-                <ChatbotPrompt prompt={prompt} handleSendMessage={handleSendMessage} theme={theme} />
+                <ChatbotPrompt key={prompt} prompt={prompt} handleSendMessage={handleSendMessage} theme={theme} />
               ))}
             </div>}
           </div>

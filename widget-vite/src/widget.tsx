@@ -13,10 +13,32 @@ import NotificationBadge from "./components/notification-badge"
 import ChatbotInput from "./components/chatbot-input"
 import ChatbotOpenButton from "./components/chatbot-open-btn"
 
-export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true }: {
+export type WidgetContext = {
+  open: {
+    isOpen: boolean, 
+    setIsOpen: (v: boolean) => void
+  },
+  messageOptions: {
+    messages: Message[],
+    setMessages: (messages: Message[]) => void,
+  },
+  input: {
+    inputValue: string,
+    setInputValue: (value: string) => void,
+  }
+};
+
+export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true, pageContext }: {
   theme?: Theme,
   placeholder?: boolean,
   notificationBadge?: boolean,
+
+  // Function to execute depending on the page the user is on
+  // Context contains all methods for working with the widget context
+  pageContext?: Record<string, {
+    exec: (context: WidgetContext) => void;
+    timer: number; // How long the user needs to be on the page to call the function
+  }>
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(placeholder ? placeholderMessages : [])
@@ -31,6 +53,23 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    const currentPath = window.location.pathname;
+
+    if (pageContext) {
+      for (const [path, {exec, timer}] of Object.entries(pageContext)) {
+        if (path === currentPath) {
+          exec({
+            open: {isOpen, setIsOpen},
+            messageOptions: {messages, setMessages},
+            input: {inputValue, setInputValue}
+          });
+          break;
+        }
+      }
+    }
+  }, [pageContext])
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return
@@ -102,7 +141,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
       {/* Chat Button */}
       <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} />
 
-      {(!isOpen && notificationBadge)&& ( <NotificationBadge /> )}
+      {(!isOpen && notificationBadge) && (<NotificationBadge />)}
     </div>
   )
 }

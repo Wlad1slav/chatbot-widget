@@ -47,3 +47,27 @@
 .glow-animation {
   animation: glow 2s ease-in-out infinite;
 }
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.message a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.message h1, .message h2, .message h3, .message h4, .message h5, .message h6 {
+  font-weight: bold;
+}
+
+.message ol, .message ul {
+  list-style: disc;
+  margin-left: 5px;
+}
+
+.message b, .message strong {
+  font-weight: bold;
+}

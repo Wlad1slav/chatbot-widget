@@ -16,7 +16,7 @@ export const placeholderMessages: Message[] = [
     {
         id: "3",
         content:
-            "I can help you with various tasks including answering questions, providing information, assisting with problem-solving, and much more. What would you like to explore?",
+            "I can help you with various tasks including answering questions, [providing information](/test), assisting with problem-solving, and much more. What would you like to explore?",
         sender: "bot",
         timestamp: new Date(Date.now() - 180000),
     },

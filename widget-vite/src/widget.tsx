@@ -12,10 +12,11 @@ import { getStyle } from "./utils/styles"
 import NotificationBadge from "./components/notification-badge"
 import ChatbotInput from "./components/chatbot-input"
 import ChatbotOpenButton from "./components/chatbot-open-btn"
+import { sleep } from "./utils/helpers"
 
 export type WidgetContext = {
   open: {
-    isOpen: boolean, 
+    isOpen: boolean,
     setIsOpen: (v: boolean) => void
   },
   messageOptions: {
@@ -37,7 +38,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
   // Context contains all methods for working with the widget context
   pageContext?: Record<string, {
     exec: (context: WidgetContext) => void;
-    timer: number; // How long the user needs to be on the page to call the function
+    timer: number; // How long the user needs to be on the page to call the function (ms)
   }>
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -58,18 +59,23 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
     const currentPath = window.location.pathname;
 
     if (pageContext) {
-      for (const [path, {exec, timer}] of Object.entries(pageContext)) {
+      for (const [path, { exec, timer }] of Object.entries(pageContext)) {
         if (path === currentPath) {
-          exec({
-            open: {isOpen, setIsOpen},
-            messageOptions: {messages, setMessages},
-            input: {inputValue, setInputValue}
-          });
+          execPageContext(timer, exec);
           break;
         }
       }
     }
-  }, [pageContext])
+  }, [pageContext]);
+
+  const execPageContext = async (timer: number, exec: (context: WidgetContext) => void) => {
+    await sleep(timer);
+    exec({
+      open: { isOpen, setIsOpen },
+      messageOptions: { messages, setMessages },
+      input: { inputValue, setInputValue }
+    });
+  }
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return

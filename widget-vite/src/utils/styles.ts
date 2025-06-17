@@ -11,7 +11,8 @@ const themeStyles: Style = {
     messageBot: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
     messageUser: 'bg-transparent backdrop-blur-3xl text-white',
     input: 'bg-slate-800/50 border-purple-500/30 text-white placeholder-slate-400 focus:ring-purple-500 focus:border-transparent',
-    sendButton: 'text-white'
+    sendButton: 'text-white',
+    prompt: 'bg-black/50 backdrop-blur-3xl text-white'
   },
   boring: {
     mainBackground: 'bg-white',
@@ -20,7 +21,8 @@ const themeStyles: Style = {
     messageBot: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
     messageUser: 'bg-black/80 text-white',
     input: 'border-purple-500/30 placeholder-slate-400 focus:ring-purple-500 focus:border-transparent',
-    sendButton: 'text-purple-500'
+    sendButton: 'text-purple-500',
+    prompt: 'bg-gradient-to-br from-black/80 to-black/90 text-white'
   }
 }
 

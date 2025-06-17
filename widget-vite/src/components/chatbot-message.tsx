@@ -19,10 +19,10 @@ export default function ChatbotMessage({ message, index, theme }: { message: Mes
         >
             <div
                 className={`
-                  max-w-[80%] rounded-2xl p-3 shadow-lg
+                  rounded-2xl p-3 shadow-lg
                   ${message.sender === "user"
-                        ? `${getStyle(theme, 'messageUser')} ml-4`
-                        : `${getStyle(theme, 'messageBot')} mr-4`
+                        ? `${getStyle(theme, 'messageUser')} ml-4 max-w-[80%]`
+                        : `${getStyle(theme, 'messageBot')} mr-4 max-w-[100%]`
                     }
                 `}
             >

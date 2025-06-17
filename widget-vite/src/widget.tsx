@@ -14,6 +14,7 @@ import ChatbotInput from "./components/chatbot-input"
 import ChatbotOpenButton from "./components/chatbot-open-btn"
 import { sleep } from "./utils/helpers"
 import ChatbotPrompt from "./components/chatbot-prompt"
+import { sendMessageToBot } from "./utils/api"
 
 export type WidgetContext = {
   open: {
@@ -34,7 +35,7 @@ export type WidgetContext = {
   }
 };
 
-export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true, pageContext, chatPrompts = [] }: {
+export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true, pageContext, chatPrompts = [], chatbotUrl }: {
   theme?: Theme,
   placeholder?: boolean,
   notificationBadge?: boolean,
@@ -47,6 +48,8 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
   }>;
 
   chatPrompts?: string[];
+
+  chatbotUrl: string;
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(placeholder ? placeholderMessages : [])
@@ -88,41 +91,56 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
       open: { isOpen, setIsOpen },
       messageOptions: { messages, setMessages },
       input: { inputValue, setInputValue },
-      promptsOptions: {prompts, setPrompts}
+      promptsOptions: { prompts, setPrompts }
     });
   }
 
-  const handleSendMessage = (customeInput?: string) => {
+  const handleSendMessage = async (customeInput?: string) => {
     // if (input) setInputValue(input)
     const input = customeInput ? customeInput : inputValue.trim();
     if (!input) return
 
+    // add user message
     const newMessage: Message = {
       id: Date.now().toString(),
       content: input,
       sender: "user",
       timestamp: new Date(),
     }
-
     setMessages((prev) => [...prev, newMessage])
+
     setInputValue("")
     setIsTyping(true)
 
-    const botResponse: Message = {
-      id: (Date.now() + 1).toString(),
-      content:
-        "Thanks for your message! This is a demo response. In a real implementation, this would connect to an AI service.",
-      sender: "bot",
-      timestamp: new Date(),
+    try {
+      const answer = await sendMessageToBot(input, chatbotUrl)
+
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: answer,
+        sender: "bot",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, botResponse])
+    } catch (e) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content:
+          "Unfortunately, an error occurred while processing your request.",
+        sender: "bot",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
+      setIsTyping(false)
     }
-    setMessages((prev) => [...prev, botResponse])
-    setIsTyping(false)
+
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = async (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSendMessage()
+      await handleSendMessage()
     }
   }
 
@@ -163,7 +181,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
           </div>
 
           {/* Input */}
-          <ChatbotInput handleKeyPress={handleKeyPress} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={handleSendMessage} theme={theme} />
+          <ChatbotInput handleKeyPress={handleKeyPress} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={() => handleSendMessage()} theme={theme} />
         </div>
       </div>
 

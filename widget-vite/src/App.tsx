@@ -5,7 +5,7 @@ function App() {
     <>
       <ChatbotWidget
         chatbotUrl={import.meta.env.VITE_TEST_API}
-        placeholder
+        dialogeBaseUrl={import.meta.env.VITE_TEST_API_DIALOGE}
         theme='boring'
         pageContext={{
           '/': {

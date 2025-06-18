@@ -14,7 +14,7 @@ import ChatbotInput from "./components/chatbot-input"
 import ChatbotOpenButton from "./components/chatbot-open-btn"
 import { sleep } from "./utils/helpers"
 import ChatbotPrompt from "./components/chatbot-prompt"
-import { sendMessageToBot } from "./utils/api"
+import { getDialoge, sendMessageToBot } from "./utils/api"
 
 export type WidgetContext = {
   open: {
@@ -35,9 +35,8 @@ export type WidgetContext = {
   }
 };
 
-export default function ChatbotWidget({ theme = 'boring', placeholder = false, notificationBadge = true, pageContext, chatPrompts = [], chatbotUrl }: {
+export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl }: {
   theme?: Theme,
-  placeholder?: boolean,
   notificationBadge?: boolean,
 
   // Function to execute depending on the page the user is on
@@ -48,11 +47,14 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
   }>;
 
   chatPrompts?: string[];
-
   chatbotUrl: string;
+  dialogeBaseUrl: string;
+  greeting?: string;
 }) {
+  const greetingMsg: Message[] = greeting ? [{ content: greeting, sender: 'bot' }] : [];
+
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>(placeholder ? placeholderMessages : [])
+  const [messages, setMessages] = useState<Message[]>(greeting ? greetingMsg : [])
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [showPrompts, setShowPrompts] = useState(true)
@@ -63,6 +65,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
+  // trigger for new messages
   useEffect(() => {
     const countUserMessages = messages.filter(message => message.sender === 'user');
 
@@ -72,6 +75,21 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
     scrollToBottom()
   }, [messages])
 
+  // get past dialog
+  useEffect(() => {
+    if (messages.length <= 1) {
+      getDialoge(dialogeBaseUrl)
+        .then(dialoge => {
+          const messages: Message[] = dialoge.map(message => ({
+            content: message.data.content,
+            sender: message.type === 'human' ? 'user' : 'bot'
+          }));
+          setMessages([...greetingMsg, ...messages]);
+        });
+    }
+  }, [dialogeBaseUrl]);
+
+  // exec additional actions with the context
   useEffect(() => {
     const currentPath = window.location.pathname;
 
@@ -102,10 +120,8 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
 
     // add user message
     const newMessage: Message = {
-      id: Date.now().toString(),
       content: input,
       sender: "user",
-      timestamp: new Date(),
     }
     setMessages((prev) => [...prev, newMessage])
 
@@ -116,19 +132,15 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
       const answer = await sendMessageToBot(input, chatbotUrl)
 
       const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
         content: answer,
         sender: "bot",
-        timestamp: new Date(),
       }
       setMessages((prev) => [...prev, botResponse])
     } catch (e) {
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
         content:
           "Unfortunately, an error occurred while processing your request.",
         sender: "bot",
-        timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
     } finally {
@@ -162,7 +174,7 @@ export default function ChatbotWidget({ theme = 'boring', placeholder = false, n
           <div className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
             <div className="space-y-4 ">
               {messages.map((message, index) => (
-                <ChatbotMessage key={message.id} message={message} index={index} theme={theme} />
+                <ChatbotMessage key={message.content} message={message} index={index} theme={theme} />
               ))}
 
               {/* Typing Indicator */}

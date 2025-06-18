@@ -7,7 +7,6 @@ import ChatbotHeader from "./components/chatbot-header"
 import type { Message, Theme } from "./utils/types"
 import ChatbotMessage from "./components/chatbot-message"
 import TypingIndicator from "./components/typing-indicator"
-import { placeholderMessages } from "./utils/placeholders"
 import { getStyle } from "./utils/styles"
 import NotificationBadge from "./components/notification-badge"
 import ChatbotInput from "./components/chatbot-input"
@@ -32,7 +31,8 @@ export type WidgetContext = {
   promptsOptions: {
     prompts: string[],
     setPrompts: (prompts: string[]) => void
-  }
+  },
+  scrollToBottom: () => void
 };
 
 export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl }: {
@@ -109,7 +109,8 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
       open: { isOpen, setIsOpen },
       messageOptions: { messages, setMessages },
       input: { inputValue, setInputValue },
-      promptsOptions: { prompts, setPrompts }
+      promptsOptions: { prompts, setPrompts },
+      scrollToBottom
     });
   }
 

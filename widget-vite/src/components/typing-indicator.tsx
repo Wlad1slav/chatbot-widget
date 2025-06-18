@@ -2,8 +2,8 @@ import { Bot } from "lucide-react";
 
 export default function TypingIndicator() {
     return (
-        <div className="flex justify-start animate-pulse">
-            <div className="bg-gradient-to-r from-slate-700 to-slate-600 rounded-2xl p-3 border border-purple-500/30 mr-4">
+        <div className="flex justify-start">
+            <div className="bg-gradient-to-r from-slate-700 to-slate-600 rounded-2xl p-3 mr-4">
                 <div className="flex items-center space-x-2">
                     <Bot className="w-4 h-4 text-cyan-400" />
                     <div className="flex space-x-1">

@@ -7,5 +7,6 @@ export function mountChatbotWidget(
 ) {
     const el =
         typeof target === "string" ? document.querySelector(target)! : target;
+
     ReactDOM.createRoot(el).render(<ChatbotWidget {...props} />);
 }

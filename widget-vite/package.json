@@ -1,13 +1,19 @@
 {
-  "name": "widget-vite",
-  "private": true,
-  "version": "0.0.0",
+  "name": "ai-chatbot-widget",
+  "version": "0.0.6",
   "type": "module",
+  "main": "dist/chatbot-widget.iife.js",
+  "module": "dist/chatbot-widget.es.js",
+  "style": "dist/index.css",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "rm -rf dist && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm publish --access public"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",

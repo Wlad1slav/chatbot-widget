@@ -12,14 +12,23 @@ export default defineConfig({
       formats: ["iife", "es"],         // iife = <script>, es = import
       fileName: (fmt) => `chatbot-widget.${fmt}.js`,
     },
-    rollupOptions: {
-      // React та ReactDOM залишаємо «зовні», щоб не товстити бандл
-      external: ["react", "react-dom"],
-      output: {
-        globals: { react: "React", "react-dom": "ReactDOM" },
-      },
-    },
+    // rollupOptions: {
+    //   external: ["react", "react-dom", "react-dom/client"],
+    //   output: {
+    //     globals: {
+    //       react: "React",
+    //       "react-dom": "ReactDOM",
+    //       "react-dom/client": "ReactDOM",
+    //     },
+    //   },
+    // },
     cssCodeSplit: true,                // винесе CSS окремим файлом
     minify: "esbuild",
   },
+  define: {
+    // костиль проти використання пакетами зміних оточення
+    "process.env.NODE_ENV": JSON.stringify("production"),
+    "process.env": "{}",
+    "process": JSON.stringify({ env: { NODE_ENV: "production" } })
+  }
 })

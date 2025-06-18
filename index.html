@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@0.0.6/dist/index.css" />
+    <title>Preprod</title>
+</head>
+
+<body>
+    <div id="chatbot"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@0.0.6/dist/chatbot-widget.iife.js"></script>
+
+    <script>
+        ChatbotWidget.mountChatbotWidget("#chatbot", {
+            chatbotUrl: 'https://primary-production-d384.up.railway.app/webhook/66f41e72-f2c1-4c2c-b305-f2eadbb35365',
+            dialogeBaseUrl: 'https://primary-production-d384.up.railway.app/webhook/6127be98-cf2f-4847-b729-93b3e3394357',
+            theme: 'boring'
+        });
+    </script>
+</body>
+
+</html>

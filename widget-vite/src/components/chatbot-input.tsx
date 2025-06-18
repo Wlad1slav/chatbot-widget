@@ -12,8 +12,7 @@ export default function ChatbotInput({inputValue, setInputValue, handleSendMessa
     return (
         <div className="p-4 border-t border-purple-500/20">
             <div className="flex space-x-2">
-                <input
-                    type="text"
+                <textarea
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}

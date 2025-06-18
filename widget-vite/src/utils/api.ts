@@ -1,7 +1,12 @@
 import axios from "axios"
 
 export const sendMessageToBot = async (message: string, url: string): Promise<string> => {
-    const response = await axios.post<{ output: string }>(url, { message });
+    const utm = window.location.search.replace('?', '').split('&').find(param => param.includes('utm'))?.split('=')[1];
+
+    const response = await axios.post<{ output: string }>(url, { message }, {
+        headers: { utm }
+    });
+    
     return response.data.output;
 }
 
@@ -18,7 +23,7 @@ export const getDialoge = async (url: string) => {
     for (const messageStringJson of response.data.propertyName) {
         const message = JSON.parse(messageStringJson)
         messagesData.push(message);
-    } 
+    }
 
     return messagesData.reverse();
 }

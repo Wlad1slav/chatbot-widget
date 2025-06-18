@@ -6,10 +6,10 @@ import { useMemo } from "react";
 
 export default function ChatbotMessage({ message, index, theme }: { message: Message, index: number, theme: Theme }) {
 
-    const html = useMemo(() => marked(message.content, { 
+    const html = useMemo(() => marked(message.content.replaceAll('```', ''), { 
         gfm: true, 
         breaks: true 
-      }), [message]);
+      }), [message.content]);
 
     return (
         <div

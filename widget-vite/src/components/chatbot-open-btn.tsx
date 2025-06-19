@@ -7,10 +7,10 @@ export default function ChatbotOpenButton({setIsOpen, isOpen}: {
     return (
         <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`
-          w-14 h-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700
-          rounded-full shadow-2xl flex items-center justify-center text-white
-          transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer
+            className={`chatbot-open-btn
+          w-14 h-14
+          rounded-full shadow-2xl items-center justify-center text-white
+          transition-all duration-300 transform active:scale-90 cursor-pointer
           ${isOpen ? "rotate-180" : "rotate-0"}
         `}
             style={{

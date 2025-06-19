@@ -162,7 +162,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
       {/* Chat Window */}
       <div
         className={`
-        absolute bottom-16 right-0 w-96 h-[700px] 
+        absolute bottom-16 right-0 w-96 h-[550px] 
         transform transition-all duration-300 ease-in-out origin-bottom-right
         ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}
       `}

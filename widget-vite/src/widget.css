@@ -26,8 +26,13 @@
 .message {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
 }
+
+.message p, .message b, .message a {
+  font-size: 15px;
+  margin-bottom: 0;
+} 
 
 .message a {
   text-decoration: underline;
@@ -45,4 +50,49 @@
 
 .message b, .message strong {
   font-weight: bold;
+}
+
+/* Widget header */
+.widget-header h3, .widget-header p {
+  margin-bottom: 0;
+}
+
+.widget-header h3 {
+  font-size: 1.25rem;
+}
+
+.widget-header p {
+  font-size: .875rem;
+}
+
+/* Chatbot input*/
+.chatbot-input textarea {
+  min-height: 60px!important;
+  max-height: 100px;
+  border-radius: 10px;
+  border: solid 1px rgba(168, 85, 247, 0.5);
+  outline: none;
+}
+
+.chatbot-input textarea:focus {
+  outline: none;
+}
+
+/* Chatbot open button */
+.chatbot-open-btn {
+  background: inherit;
+  display: flex;
+  background-image: linear-gradient(
+    to right,
+    #9333ea, /* purple-600 */
+    #2563eb  /* blue-600 */
+  );
+}
+
+.chatbot-open-btn:hover {
+  background-image: linear-gradient(
+    to right,
+    #7e22ce, /* purple-700 */
+    #1d4ed8  /* blue-700 */
+  );
 }

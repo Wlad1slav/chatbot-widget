@@ -20,7 +20,7 @@ const themeStyles: Style = {
     headerLogoIcon: 'text-white',
     messageBot: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
     messageUser: 'bg-black/80 text-white',
-    input: 'border-purple-500/30 placeholder-slate-400 focus:ring-purple-500 focus:border-transparent',
+    input: 'placeholder-slate-400',
     sendButton: 'text-purple-500',
     prompt: 'bg-gradient-to-br from-black/80 to-black/90 text-white'
   }

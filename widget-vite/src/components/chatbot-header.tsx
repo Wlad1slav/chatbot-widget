@@ -4,15 +4,15 @@ import { getStyle } from "../utils/styles";
 
 export default function ChatbotHeader({ setIsOpen, theme }: { setIsOpen: (isOpen: boolean) => void , theme: Theme}) {
     return (
-        <div className={`bg-gradient-to-r ${getStyle(theme, 'header')} p-4 flex items-center justify-between`}>
+        <div className={`widget-header bg-gradient-to-r ${getStyle(theme, 'header')} p-4 flex items-center justify-between`}>
             <div className="flex items-center space-x-3">
                 {/* Logo */}
                 <div className={`w-10 h-10 ${getStyle(theme, 'headerLogoBg')} rounded-full flex items-center justify-center`}>
                     <Bot className={`w-6 h-6 ${getStyle(theme, 'headerLogoIcon')}`} />
                 </div>
                 <div>
-                    <h3 className="text-white font-semibold">AI Assistant</h3>
-                    <p className="text-purple-100 text-sm">Online</p>
+                    <h3 className="text-white font-semibold text-xl mb-0">AI Assistant</h3>
+                    <p className="text-purple-100 text-sm mb-0">Online</p>
                 </div>
             </div>
             <button

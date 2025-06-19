@@ -13,7 +13,7 @@ export default function ChatbotOpenButton({setIsOpen, isOpen, theme}: {
             className={`chatbot-open-btn
           w-14 h-14 ${getStyle(theme, 'openButton')}
           rounded-full shadow-2xl items-center justify-center text-white
-          transition-all duration-300 transform active:scale-9 cursor-pointer
+          transition-all duration-300 transform active:scale-9 cursor-pointer backdrop-blur-xl
           ${isOpen ? "rotate-180" : "rotate-0"}
         `}
             style={{

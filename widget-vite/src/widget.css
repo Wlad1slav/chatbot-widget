@@ -74,6 +74,12 @@
   outline: none;
 }
 
+@media screen and (max-width: 768px) {
+  .chatbot-input textarea {
+    height: 55px;
+  }
+}
+
 .chatbot-input textarea:focus {
   outline: none;
 }

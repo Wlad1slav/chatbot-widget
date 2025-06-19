@@ -158,11 +158,11 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 ai-chatbot">
+    <div className="fixed bottom-1 right-1 md:bottom-6 md:right-6 z-50 ai-chatbot ">
       {/* Chat Window */}
       <div
         className={`
-        absolute bottom-16 right-0 w-96 h-[550px] 
+        absolute bottom-15 sm:bottom-16 right-0 w-86 sm:w-96 h-[65vh] 
         transform transition-all duration-300 ease-in-out origin-bottom-right
         ai-chatbot-window
         ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}
@@ -173,7 +173,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
           <ChatbotHeader setIsOpen={setIsOpen} theme={theme} />
 
           {/* Messages */}
-          <div className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
+          <div className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
             <div className="space-y-4 ">
               {messages.map((message, index) => (
                 <ChatbotMessage key={message.content} message={message} index={index} theme={theme} />

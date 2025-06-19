@@ -1,6 +1,6 @@
 {
   "name": "ai-chatbot-widget",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "type": "module",
   "main": "dist/chatbot-widget.iife.js",
   "module": "dist/chatbot-widget.es.js",

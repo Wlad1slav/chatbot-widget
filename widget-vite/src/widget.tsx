@@ -158,12 +158,13 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 ai-chatbot">
       {/* Chat Window */}
       <div
         className={`
         absolute bottom-16 right-0 w-96 h-[550px] 
         transform transition-all duration-300 ease-in-out origin-bottom-right
+        ai-chatbot-window
         ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}
       `}
       >
@@ -199,7 +200,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
       </div>
 
       {/* Chat Button */}
-      <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} theme={theme} />
 
       {(!isOpen && notificationBadge) && (<NotificationBadge />)}
     </div>

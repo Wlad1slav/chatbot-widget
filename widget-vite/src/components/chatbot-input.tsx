@@ -10,7 +10,7 @@ export default function ChatbotInput({inputValue, setInputValue, handleSendMessa
     theme: Theme;
 }) {
     return (
-        <div className="p-4 border-t border-purple-500/20 chatbot-input">
+        <div className={`p-4 ${getStyle(theme, 'inputContainer')} chatbot-input`}>
             <div className="flex space-x-2">
                 <textarea
                     value={inputValue}

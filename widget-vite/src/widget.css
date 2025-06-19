@@ -70,7 +70,7 @@
   min-height: 60px!important;
   max-height: 100px;
   border-radius: 10px;
-  border: solid 1px rgba(168, 85, 247, 0.5);
+  /* border: solid 1px rgba(168, 85, 247, 0.5); */
   outline: none;
 }
 
@@ -80,19 +80,18 @@
 
 /* Chatbot open button */
 .chatbot-open-btn {
-  background: inherit;
   display: flex;
-  background-image: linear-gradient(
+  /* background-image: linear-gradient(
     to right,
-    #9333ea, /* purple-600 */
-    #2563eb  /* blue-600 */
-  );
+    #9333ea, 
+    #2563eb  
+  ); */
 }
 
-.chatbot-open-btn:hover {
+/* .chatbot-open-btn:hover {
   background-image: linear-gradient(
     to right,
-    #7e22ce, /* purple-700 */
-    #1d4ed8  /* blue-700 */
+    #7e22ce, 
+    #1d4ed8  
   );
-}
+} */

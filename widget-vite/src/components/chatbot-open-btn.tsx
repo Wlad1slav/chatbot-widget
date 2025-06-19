@@ -1,23 +1,26 @@
 import { MessageCircle, X } from "lucide-react";
+import type { Theme } from "../utils/types";
+import { getStyle } from "../utils/styles";
 
-export default function ChatbotOpenButton({setIsOpen, isOpen}: {
+export default function ChatbotOpenButton({setIsOpen, isOpen, theme}: {
     setIsOpen: (value: boolean) => void;
     isOpen: boolean;
+    theme: Theme;
 }) {
     return (
-        <button
+        <div
             onClick={() => setIsOpen(!isOpen)}
             className={`chatbot-open-btn
-          w-14 h-14
+          w-14 h-14 ${getStyle(theme, 'openButton')}
           rounded-full shadow-2xl items-center justify-center text-white
-          transition-all duration-300 transform active:scale-90 cursor-pointer
+          transition-all duration-300 transform active:scale-9 cursor-pointer
           ${isOpen ? "rotate-180" : "rotate-0"}
         `}
             style={{
-                boxShadow: "0 0 30px rgba(147, 51, 234, 0.5)",
+                boxShadow: getStyle(theme, 'openButtonShadow'),
             }}
         >
             {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-        </button>
+        </div>
     )
 }

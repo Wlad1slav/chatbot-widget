@@ -26,8 +26,8 @@ export default function ChatbotMessage({ message, index, theme }: { message: Mes
                 `}
             >
                 <div className="flex items-start space-x-2">
-                    {message.sender === "bot" && <Bot className="w-4 h-4 mt-0.5 text-pink-200 flex-shrink-0" />}
-                    {message.sender === "user" && <User className="w-4 h-4 mt-0.5 text-pink-200 flex-shrink-0" />}
+                    {message.sender === "bot" && <Bot className={`w-4 h-4 mt-0.5 ${getStyle(theme, 'messageBotIcon')} flex-shrink-0`} />}
+                    {message.sender === "user" && <User className={`w-4 h-4 mt-0.5 ${getStyle(theme, 'messageUserIcon')} flex-shrink-0`} />}
                     <div className="text-sm leading-relaxed message" dangerouslySetInnerHTML={{ __html: html }} />
                 </div>
             </div>

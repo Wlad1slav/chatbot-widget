@@ -3,4 +3,4 @@ export type Message = {
     sender: "user" | "bot"
 };
 
-export type Theme = 'boring' | 'futuristic' | 'lighty';
+export type Theme = 'boring' | 'futuristic' | 'lighty' | 'o Canada';

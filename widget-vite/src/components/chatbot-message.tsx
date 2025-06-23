@@ -13,7 +13,7 @@ export default function ChatbotMessage({ message, index, theme }: { message: Mes
 
     return (
         <div
-            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+            className={`flex ${message.sender === "user" ? "justify-end ai-chatbot__user-message" : "justify-start ai-chatbot__bot-message"}`}
             style={{ animationDelay: `${index * 0.1}s` }}
         >
             <div

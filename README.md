@@ -2,6 +2,8 @@
 
 This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) clients who have used our AI-agent integration services in their online stores. It’s designed for commercial websites to help visitors quickly get answers to their questions and place orders.
 
+![preview](https://github.com/user-attachments/assets/998e8caa-0bb5-430e-b906-e9a77cc928e1)
+
 ## Features
 - [x] Theme customization – the theme parameter applies predefined styles that change the background, button, and message-bubble colors.
 - [x] Animated popup window – the chat window is anchored to the bottom-right corner and opens/collapses with smooth animation.

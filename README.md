@@ -85,15 +85,10 @@ The themes are stylized using tailwind, you can see them here: `/widget-vite/src
 
 There is currently no solution for creating custom themes by passing props. If needed, you can use plain CSS with the !important directive.
 
-#### futuristic
-The “futuristic” theme plunges you into a cyberpunk, sci-fi world:
-- A deep gradient from dark slate through purple to near-black evokes the infinity of space.
-- Bright purple-to-blue accents in the header and open button emit neon energy.
-- Bot messages in warm purple-pink gradients with white text resemble holograms.
-- Semi-transparent, heavily blurred user message backgrounds create a digital cocoon.
-- Glow effects on the open button and notification badge complete the high-tech vibe.
-
 #### lighty
+
+![Screenshot 2025-06-23 at 6 07 37 PM](https://github.com/user-attachments/assets/ac98f294-9e9d-4a61-961c-26c86186d431)
+
 The “lighty” theme combines minimalism with vibrant accents:
 - A clean white background makes the interface feel light and airy.
 - A contrasting dark header adds structure and focuses attention on navigation.
@@ -102,6 +97,9 @@ The “lighty” theme combines minimalism with vibrant accents:
 - Buttons and input fields feature delicate purple outlines for a modern yet refined style.
 
 #### boring
+
+![Screenshot 2025-06-23 at 6 07 46 PM](https://github.com/user-attachments/assets/8500550e-4aa3-475e-abed-a38fda720c8a)
+
 The “boring” theme offers a maximally neutral and formal interface:
 - A pure white background and a solid dark header (no gradients) create a very simple backdrop.
 - Bot messages in dark gray blocks with white text look like a classic terminal chat.
@@ -109,7 +107,21 @@ The “boring” theme offers a maximally neutral and formal interface:
 - Inputs and buttons have thin gray borders that barely draw attention.
 - This style suits corporate or internal tools where functionality matters more than aesthetics.
 
+#### futuristic
+
+![Screenshot 2025-06-23 at 6 07 19 PM](https://github.com/user-attachments/assets/7201bac1-703a-4ee0-8aed-655f5f53901c)
+
+The “futuristic” theme plunges you into a cyberpunk, sci-fi world:
+- A deep gradient from dark slate through purple to near-black evokes the infinity of space.
+- Bright purple-to-blue accents in the header and open button emit neon energy.
+- Bot messages in warm purple-pink gradients with white text resemble holograms.
+- Semi-transparent, heavily blurred user message backgrounds create a digital cocoon.
+- Glow effects on the open button and notification badge complete the high-tech vibe.
+
 #### o Canada
+
+![Screenshot 2025-06-23 at 6 07 28 PM](https://github.com/user-attachments/assets/56aa6560-6b96-4680-b4c1-c54dfca76596)
+
 The “o Canada” theme embodies nature and stability:
 - A white background recalls Canadian forests, snowy landscapes, and purity.
 - The header and bot elements use a deep green (#016553), reminiscent of evergreen woods.

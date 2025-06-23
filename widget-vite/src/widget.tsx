@@ -35,7 +35,7 @@ export type WidgetContext = {
   scrollToBottom: () => void
 };
 
-export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl }: {
+export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl, title='AI Assistant', imageUrl, imageWidth }: {
   theme?: Theme,
   notificationBadge?: boolean,
 
@@ -50,6 +50,10 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   chatbotUrl: string;
   dialogeBaseUrl: string;
   greeting?: string;
+
+  title?: string;
+  imageUrl?: string;
+  imageWidth?: string;
 }) {
   const greetingMsg: Message[] = greeting ? [{ content: greeting, sender: 'bot' }] : [];
 

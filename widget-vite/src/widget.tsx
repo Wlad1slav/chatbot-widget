@@ -60,6 +60,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   const [showPrompts, setShowPrompts] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [prompts, setPrompts] = useState<string[]>(chatPrompts)
+  const [displayNotify, setDisplayNotify] = useState(notificationBadge)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -102,6 +103,12 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
       }
     }
   }, [pageContext]);
+
+  useEffect(() => {
+    if (isOpen && displayNotify) {
+      setDisplayNotify(false)
+    }
+  }, [isOpen])
 
   const execPageContext = async (timer: number, exec: (context: WidgetContext) => void) => {
     await sleep(timer);
@@ -170,7 +177,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
       >
         <div className={`${getStyle(theme, 'mainBackground')} rounded-4xl shadow-2xl backdrop-blur-xl h-full flex flex-col overflow-hidden`}>
           {/* Header */}
-          <ChatbotHeader setIsOpen={setIsOpen} theme={theme} />
+          <ChatbotHeader setIsOpen={setIsOpen} theme={theme} title={title} imageUrl={imageUrl} imageWidth={imageWidth} />
 
           {/* Messages */}
           <div className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
@@ -202,7 +209,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
       {/* Chat Button */}
       <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} theme={theme} />
 
-      {(!isOpen && notificationBadge) && (<NotificationBadge />)}
+      {(!isOpen && displayNotify) && (<NotificationBadge theme={theme} />)}
     </div>
   )
 }

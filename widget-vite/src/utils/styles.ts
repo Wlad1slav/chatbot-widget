@@ -41,7 +41,7 @@ const themeStyles: Style = {
     header: 'bg-black/90',
     headerLogoIcon: 'text-white',
     messageBotIcon: 'text-white',
-    messageBot: 'bg-black/80 text-white',
+    messageBot: 'bg-black/80 text-white backdrop-blur-xl',
     messageUserIcon: 'text-black',
     messageUser: 'text-black',
     input: 'placeholder-slate-400 border border-black/20',

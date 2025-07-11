@@ -4,7 +4,7 @@ import { getStyle } from "../utils/styles";
 import { marked } from 'marked';
 import { useMemo } from "react";
 
-export default function ChatbotMessage({ message, index, theme }: { message: Message, index: number, theme: Theme }) {
+export default function ChatbotMessage({ message, index, theme, margin=true }: { message: Message, index: number, theme: Theme, margin?: boolean }) {
 
     const html = useMemo(() => marked(message.content.replaceAll('```', ''), { 
         gfm: true, 
@@ -13,15 +13,15 @@ export default function ChatbotMessage({ message, index, theme }: { message: Mes
 
     return (
         <div
-            className={`flex ${message.sender === "user" ? "justify-end ai-chatbot__user-message" : "justify-start ai-chatbot__bot-message"}`}
+            className={`flex max-w-[400px] ${message.sender === "user" ? "justify-end ai-chatbot__user-message" : "justify-start ai-chatbot__bot-message"}`}
             style={{ animationDelay: `${index * 0.1}s` }}
         >
             <div
                 className={`
                   rounded-2xl p-3 shadow-lg
                   ${message.sender === "user"
-                        ? `${getStyle(theme, 'messageUser')} ml-4 max-w-[80%]`
-                        : `${getStyle(theme, 'messageBot')} mr-4 max-w-[100%]`
+                        ? `${getStyle(theme, 'messageUser')} ${margin ? 'ml-4' : ''} max-w-[80%]`
+                        : `${getStyle(theme, 'messageBot')} ${margin ? 'mr-4' : ''} max-w-[100%]`
                     }
                 `}
             >

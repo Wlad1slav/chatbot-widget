@@ -4,6 +4,11 @@
   animation: fade-in 0.3s ease-out forwards;
 }
 
+/* Widget global */
+.ai-chatbot button {
+  width: auto!important;
+}
+
 /* Custom scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
@@ -70,11 +75,12 @@
   font-size: .875rem;
 }
 
-/* Chatbot input*/
+/* Chatbot input */
 .chatbot-input textarea {
   min-height: 60px!important;
   max-height: 100px;
   border-radius: 10px;
+  width: 100%!important;
   /* border: solid 1px rgba(168, 85, 247, 0.5); */
   outline: none;
 } 

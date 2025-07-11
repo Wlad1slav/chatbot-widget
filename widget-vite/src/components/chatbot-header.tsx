@@ -31,7 +31,7 @@ export default function ChatbotHeader({ setIsOpen, theme, title, imageUrl, image
             </div>
             <button
                 onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+                className="text-white hover:bg-white/20 rounded-full p-1 transition-colors w-auto"
             >
                 <X className="w-5 h-5" />
             </button>

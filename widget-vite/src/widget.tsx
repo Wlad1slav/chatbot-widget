@@ -14,6 +14,7 @@ import ChatbotOpenButton from "./components/chatbot-open-btn"
 import { sleep } from "./utils/helpers"
 import ChatbotPrompt from "./components/chatbot-prompt"
 import { getDialoge, sendMessageToBot } from "./utils/api"
+import { useFbIosWebviewClass } from "./hooks/useFbIosWebviewClass"
 
 export type WidgetContext = {
   open: {
@@ -35,7 +36,7 @@ export type WidgetContext = {
   scrollToBottom: () => void
 };
 
-export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl, title='AI Assistant', imageUrl, imageWidth }: {
+export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl, title = 'AI Assistant', imageUrl, imageWidth, greetingOutside = false }: {
   theme?: Theme,
   notificationBadge?: boolean,
 
@@ -50,6 +51,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   chatbotUrl: string;
   dialogeBaseUrl: string;
   greeting?: string;
+  greetingOutside?: boolean;
 
   title?: string;
   imageUrl?: string;
@@ -127,7 +129,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
 
   const handleSendMessage = async (customeInput?: string) => {
     // if (input) setInputValue(input)
-    const input = customeInput ? customeInput : inputValue.trim();
+    let input = customeInput ? customeInput : inputValue.trim();
     if (!input) return
 
     // add user message
@@ -210,10 +212,19 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
         </div>
       </div>
 
+      {(greetingOutside && greeting && !isOpen && displayNotify) && (
+        <div className="pb-2">
+          <ChatbotMessage message={{
+            content: greeting,
+            sender: 'bot'
+          }} index={0} theme={theme} margin={false} />
+        </div>
+      )}
+
       {/* Chat Button */}
       <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} theme={theme} />
 
-      {(!isOpen && displayNotify) && (<NotificationBadge theme={theme} />)}
+      {(!isOpen && displayNotify && !greetingOutside) && (<NotificationBadge theme={theme} />)}
     </div>
   )
 }

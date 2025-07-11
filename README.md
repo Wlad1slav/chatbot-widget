@@ -22,7 +22,7 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 ```html
 <head>
     <!-- ... -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@0.0.21/dist/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@latest/dist/index.css" />
 </head>
 
 <body>

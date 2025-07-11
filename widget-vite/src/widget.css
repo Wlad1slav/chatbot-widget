@@ -110,3 +110,26 @@
     #1d4ed8  
   );
 } */
+
+.ai-chatbot__share {
+  font-size: 0.75rem!important;
+  font-weight: normal!important;
+}
+
+/* Tailwind */
+
+.container {
+  width: auto!important;
+}
+
+/* iOS */
+
+.fb-ios-webview .ai-chatbot-window {
+  height: 75vh;
+  bottom: 80px;
+}
+
+.fb-ios-webview .chatbot-open-btn {
+  margin-bottom: 10px;
+  margin-right: 10px;
+}

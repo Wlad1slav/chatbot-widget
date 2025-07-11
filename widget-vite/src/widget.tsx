@@ -68,6 +68,10 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   const [prompts, setPrompts] = useState<string[]>(chatPrompts)
   const [displayNotify, setDisplayNotify] = useState(notificationBadge)
 
+  // If this is a shitty Facebook browser, 
+  // class fb-ios-webview set for the widget
+  useFbIosWebviewClass();
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }

@@ -86,9 +86,9 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
     scrollToBottom()
   }, [messages])
 
-  // get past dialog
+  // get last dialog
   useEffect(() => {
-    if (messages.length <= 1) {
+    if (isOpen && messages.length <= 1) {
       getDialoge(dialogeBaseUrl)
         .then(dialoge => {
           const messages: Message[] = dialoge.map(message => ({
@@ -98,7 +98,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
           setMessages([...greetingMsg, ...messages]);
         });
     }
-  }, [dialogeBaseUrl]);
+  }, [dialogeBaseUrl, isOpen]);
 
   // exec additional actions with the context
   useEffect(() => {

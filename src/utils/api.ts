@@ -1,29 +1,58 @@
 import axios from "axios"
 
-export const sendMessageToBot = async (message: string, url: string): Promise<string> => {
-    const utm = window.location.search.replace('?', '').split('&').find(param => param.includes('utm'))?.split('=')[1];
-
-    const response = await axios.post<{ output: string }>(url, { message }, {
-        headers: { utm }
-    });
-    
-    return response.data.output;
+type ApiEnvelope<T> = {
+    data: T;
+    message?: string;
 }
 
-export const getDialoge = async (url: string) => {
-    const response = await axios.get<{
-        propertyName: string[];
-    }>(url);
+export type PublicChatApiMessage = {
+    id: number;
+    text: string;
+    type: "INPUT" | "OUTPUT";
+    sentAt: string;
+    usage: number;
+    executionTimeMs?: number | null;
+    toolOutput?: unknown;
+}
 
-    const messagesData: {
-        type: 'ai' | 'human';
-        data: { content: string; }
-    }[] = [];
+type PublicChatState = {
+    sessionUuid: string;
+    createdAt: string;
+    messages: PublicChatApiMessage[];
+}
 
-    for (const messageStringJson of response.data.propertyName) {
-        const message = JSON.parse(messageStringJson)
-        messagesData.push(message);
-    }
+type PublicCreateMessageResult = {
+    sessionUuid: string;
+    input: PublicChatApiMessage;
+    output: PublicChatApiMessage;
+}
 
-    return messagesData.reverse();
+export type PublicChatRequestConfig = {
+    apiBaseUrl: string;
+}
+
+const buildPublicChatUrl = ({ apiBaseUrl }: PublicChatRequestConfig) => {
+    console.log({apiBaseUrl});
+    
+    const normalizedBaseUrl = apiBaseUrl.replace(/\/+$/, "");
+    return normalizedBaseUrl;
+}
+
+export const sendMessageToBot = async (message: string, config: PublicChatRequestConfig): Promise<string> => {
+    const response = await axios.post<ApiEnvelope<PublicCreateMessageResult>>(
+        buildPublicChatUrl(config),
+        { text: message },
+        { withCredentials: true }
+    );
+
+    return response.data.data.output.text;
+}
+
+export const getDialog = async (config: PublicChatRequestConfig): Promise<PublicChatApiMessage[]> => {
+    const response = await axios.get<ApiEnvelope<PublicChatState>>(
+        buildPublicChatUrl(config),
+        { withCredentials: true }
+    );
+
+    return response.data.data.messages ?? [];
 }

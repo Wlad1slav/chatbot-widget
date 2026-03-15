@@ -1,11 +1,11 @@
 import ChatbotWidget, { type WidgetContext } from './widget'
 
 function App() {
+
   return (
     <>
       <ChatbotWidget
-        chatbotUrl={import.meta.env.VITE_TEST_API}
-        dialogeBaseUrl={import.meta.env.VITE_TEST_API_DIALOGE}
+        apiBaseUrl={import.meta.env.VITE_TEST_API_BASE_URL}
         theme='boring'
         pageContext={{
           '/': {

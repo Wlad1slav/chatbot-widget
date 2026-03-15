@@ -18,6 +18,72 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 - [x] Responsive design
 - [ ] Full-page context handling – ability to send the entire page context to the server along with the user’s message.
 
+## Required API routes (for widget)
+
+`apiBaseUrl` must point to a specific public chat endpoint.
+
+The widget uses the same URL for both read/send operations and sends requests with `withCredentials: true`.
+
+### 1) Get dialog/session
+
+- Method: `GET`
+- Purpose: load existing dialog and create session (if cookie does not exist yet)
+- Response shape:
+
+```json
+{
+  "data": {
+    "sessionUuid": "uuid", // not used now
+    "createdAt": "ISO date",
+    "messages": [
+      {
+        "id": 1,
+        "text": "Hello",
+        "type": "INPUT",
+        "sentAt": "ISO date",
+        "usage": 10
+      }
+    ]
+  }
+}
+```
+
+### 2) Send message
+
+- Method: `POST`
+- Body:
+
+```json
+{
+  "text": "User message"
+}
+```
+
+- Response shape:
+
+```json
+{
+  "data": {
+    "sessionUuid": "uuid", // not used now
+    "input": {},
+    "output": {
+      "text": "Bot reply"
+    }
+  }
+}
+```
+
+### 3) Preflight (CORS)
+
+- Method: `OPTIONS`
+- Purpose: browser preflight for cross-origin `POST` with credentials
+
+Minimal required CORS headers in API response:
+- `Access-Control-Allow-Origin: <exact widget origin>`
+- `Access-Control-Allow-Credentials: true`
+- `Access-Control-Allow-Methods: GET,POST,OPTIONS`
+- `Access-Control-Allow-Headers: Content-Type` (or requested headers)
+
 ## Usage
 ```html
 <head>
@@ -49,9 +115,7 @@ Thank you for reaching out! 💬`
         ]
 
         ChatbotWidget.mountChatbotWidget("#chatbot", {
-            chatbotUrl: 'https://.../webhook/...',
-            dialogeBaseUrl: 'https://.../webhook/...',
-ty, futuristic, o Canada
+            apiBaseUrl: 'https://api.example.com',
             greeting,
             chatPrompts,
 

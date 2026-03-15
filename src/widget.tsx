@@ -1,6 +1,6 @@
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useMemo, useState, useRef, useEffect } from "react"
 
 import "./widget.css"
 import ChatbotHeader from "./components/chatbot-header"
@@ -13,30 +13,30 @@ import ChatbotInput from "./components/chatbot-input"
 import ChatbotOpenButton from "./components/chatbot-open-btn"
 import { sleep } from "./utils/helpers"
 import ChatbotPrompt from "./components/chatbot-prompt"
-import { getDialoge, sendMessageToBot } from "./utils/api"
+import { getDialog, sendMessageToBot, type PublicChatApiMessage } from "./utils/api"
 import { useFbIosWebviewClass } from "./hooks/useFbIosWebviewClass"
 
 export type WidgetContext = {
   open: {
     isOpen: boolean,
-    setIsOpen: (v: boolean) => void
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   },
   messageOptions: {
     messages: Message[],
-    setMessages: (messages: Message[]) => void,
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   },
   input: {
     inputValue: string,
-    setInputValue: (value: string) => void,
+    setInputValue: React.Dispatch<React.SetStateAction<string>>,
   },
   promptsOptions: {
     prompts: string[],
-    setPrompts: (prompts: string[]) => void
+    setPrompts: React.Dispatch<React.SetStateAction<string[]>>
   },
   scrollToBottom: () => void
 };
 
-export default function ChatbotWidget({ theme = 'boring', notificationBadge = true, greeting, pageContext, chatPrompts = [], chatbotUrl, dialogeBaseUrl, title = 'AI Assistant', imageUrl, imageWidth, greetingOutside = false }: {
+export type ChatbotWidgetProps = {
   theme?: Theme,
   notificationBadge?: boolean,
 
@@ -48,22 +48,43 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   }>;
 
   chatPrompts?: string[];
-  chatbotUrl: string;
-  dialogeBaseUrl: string;
+  apiBaseUrl: string;
   greeting?: string;
   greetingOutside?: boolean;
 
   title?: string;
   imageUrl?: string;
   imageWidth?: string;
-}) {
-  const greetingMsg: Message[] = greeting ? [{ content: greeting, sender: 'bot' }] : [];
+}
+
+const mapApiMessage = (message: PublicChatApiMessage): Message => ({
+  content: message.text,
+  sender: message.type === "INPUT" ? "user" : "bot"
+});
+
+export default function ChatbotWidget({
+  theme = 'boring',
+  notificationBadge = true,
+  greeting,
+  pageContext,
+  chatPrompts = [],
+  apiBaseUrl,
+  title = 'AI Assistant',
+  imageUrl,
+  imageWidth,
+  greetingOutside = false
+}: ChatbotWidgetProps) {
+  const greetingMsg = useMemo<Message[]>(
+    () => (greeting ? [{ content: greeting, sender: 'bot' }] : []),
+    [greeting]
+  );
 
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(greeting ? greetingMsg : [])
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [showPrompts, setShowPrompts] = useState(true)
+  const [isDialogLoaded, setIsDialogLoaded] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [prompts, setPrompts] = useState<string[]>(chatPrompts)
   const [displayNotify, setDisplayNotify] = useState(notificationBadge)
@@ -86,19 +107,25 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    setMessages(greeting ? [{ content: greeting, sender: 'bot' }] : []);
+    setIsDialogLoaded(false);
+  }, [apiBaseUrl, greeting]);
+
   // get last dialog
   useEffect(() => {
-    if (isOpen && messages.length <= 1) {
-      getDialoge(dialogeBaseUrl)
-        .then(dialoge => {
-          const messages: Message[] = dialoge.map(message => ({
-            content: message.data.content,
-            sender: message.type === 'human' ? 'user' : 'bot'
-          }));
-          setMessages([...greetingMsg, ...messages]);
+    if (isOpen && !isDialogLoaded) {
+      getDialog({ apiBaseUrl })
+        .then(dialog => {
+          const history = dialog.map(mapApiMessage);
+          setMessages([...greetingMsg, ...history]);
+          setIsDialogLoaded(true);
+        })
+        .catch(error => {
+          console.error("Failed to load chat history", error);
         });
     }
-  }, [dialogeBaseUrl, isOpen]);
+  }, [apiBaseUrl, greetingMsg, isDialogLoaded, isOpen]);
 
   // exec additional actions with the context
   useEffect(() => {
@@ -112,13 +139,15 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
         }
       }
     }
+    // pageContext should trigger only when mapping changes, not on each state update.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageContext]);
 
   useEffect(() => {
     if (isOpen && displayNotify) {
       setDisplayNotify(false)
     }
-  }, [isOpen])
+  }, [displayNotify, isOpen])
 
   const execPageContext = async (timer: number, exec: (context: WidgetContext) => void) => {
     await sleep(timer);
@@ -133,7 +162,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
 
   const handleSendMessage = async (customeInput?: string) => {
     // if (input) setInputValue(input)
-    let input = customeInput ? customeInput : inputValue.trim();
+    const input = customeInput ? customeInput : inputValue.trim();
     if (!input) return
 
     // add user message
@@ -147,14 +176,14 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
     setIsTyping(true)
 
     try {
-      const answer = await sendMessageToBot(input, chatbotUrl)
+      const answer = await sendMessageToBot(input, { apiBaseUrl })
 
       const botResponse: Message = {
         content: answer,
         sender: "bot",
       }
       setMessages((prev) => [...prev, botResponse])
-    } catch (e) {
+    } catch {
       const errorMessage: Message = {
         content:
           "Unfortunately, an error occurred while processing your request.",
@@ -193,7 +222,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
           <div className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
             <div className="space-y-4 ">
               {messages.map((message, index) => (
-                <ChatbotMessage key={message.content} message={message} index={index} theme={theme} />
+                <ChatbotMessage key={`${message.sender}-${index}`} message={message} index={index} theme={theme} />
               ))}
 
               {/* Typing Indicator */}

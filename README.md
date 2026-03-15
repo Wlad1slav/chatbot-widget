@@ -18,7 +18,7 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 - [x] Responsive design
 - [ ] Full-page context handling – ability to send the entire page context to the server along with the user’s message.
 
-## Required API routes (for widget)
+## Required API
 
 `apiBaseUrl` must point to a specific public chat endpoint.
 

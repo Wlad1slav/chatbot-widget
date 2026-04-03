@@ -9,6 +9,7 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 - [x] Animated popup window – the chat window is anchored to the bottom-right corner and opens/collapses with smooth animation.
 - [x] Open button + message badge
 - [x] External open trigger by element `id`
+- [x] Flexible widget positioning (screen presets, fixed coordinates, or near trigger)
 - [x] Welcome message
 - [x] Previous dialogue restoration
 - [x] Quick-reply prompts (chat prompts)
@@ -121,6 +122,9 @@ Thank you for reaching out! 💬`
             greeting,
             chatPrompts,
             openTriggerId: 'open-chatbot-btn', // optional: use your own trigger element
+            position: {
+                mode: 'trigger' // opens the chat near the openTriggerId element
+            },
 
             title: 'Bsign Assistant',
             imageUrl: 'https://cdn.shopify.com/s/files/1/0248/8198/7665/files/chatbot-logo.png?v=1750682293',
@@ -149,6 +153,64 @@ Thank you for reaching out! 💬`
 If `openTriggerId` is provided, the widget listens for clicks on that element and opens the dialog.
 
 When this prop is used, the built-in floating open button and notification badge are not rendered.
+
+### Positioning
+
+Use the optional `position` prop for flexible placement.
+
+```typescript
+position?: {
+  mode?: 'preset' | 'coordinates' | 'trigger';
+
+  // preset mode
+  preset?:
+    | 'bottom-right'
+    | 'bottom-left'
+    | 'top-right'
+    | 'top-left'
+    | 'bottom-center'
+    | 'top-center'
+    | 'center-right'
+    | 'center-left'
+    | 'center';
+
+  // coordinates mode
+  x?: number | string; // e.g. 24 or '24px'
+  y?: number | string; // e.g. 120 or '120px'
+
+  // trigger mode (near openTriggerId element)
+  gap?: number; // distance from trigger to chat window, px
+  offsetX?: number; // additional horizontal offset, px
+  offsetY?: number; // additional vertical offset, px
+}
+```
+
+Preset area example:
+```typescript
+position: {
+  mode: 'preset',
+  preset: 'top-left'
+}
+```
+
+Fixed coordinates example:
+```typescript
+position: {
+  mode: 'coordinates',
+  x: 40,
+  y: 140
+}
+```
+
+Open near trigger example:
+```typescript
+openTriggerId: 'open-chatbot-btn',
+position: {
+  mode: 'trigger',
+  gap: 10,
+  offsetY: -20
+}
+```
 
 ### Themes
 

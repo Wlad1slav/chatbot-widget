@@ -1,6 +1,6 @@
 import type React from "react"
 
-import { useMemo, useState, useRef, useEffect } from "react"
+import { useMemo, useState, useRef, useEffect, useCallback } from "react"
 
 import "./widget.css"
 import ChatbotHeader from "./components/chatbot-header"
@@ -36,10 +36,34 @@ export type WidgetContext = {
   scrollToBottom: () => void
 };
 
+export type WidgetPositionPreset =
+  | "bottom-right"
+  | "bottom-left"
+  | "top-right"
+  | "top-left"
+  | "bottom-center"
+  | "top-center"
+  | "center-right"
+  | "center-left"
+  | "center";
+
+export type WidgetPositionMode = "preset" | "coordinates" | "trigger";
+
+export type WidgetPosition = {
+  mode?: WidgetPositionMode;
+  preset?: WidgetPositionPreset;
+  x?: number | string;
+  y?: number | string;
+  gap?: number;
+  offsetX?: number;
+  offsetY?: number;
+};
+
 export type ChatbotWidgetProps = {
   theme?: Theme,
   notificationBadge?: boolean,
   openTriggerId?: string,
+  position?: WidgetPosition,
 
   // Function to execute depending on the page the user is on
   // Context contains all methods for working with the widget context
@@ -58,15 +82,80 @@ export type ChatbotWidgetProps = {
   imageWidth?: string;
 }
 
+const PRESET_LAYOUTS: Record<WidgetPositionPreset, {
+  containerClassName: string;
+  windowClassName: string;
+  windowOriginClassName: string;
+}> = {
+  "bottom-right": {
+    containerClassName: "bottom-1 right-1 md:bottom-6 md:right-6",
+    windowClassName: "bottom-15 sm:bottom-16 right-0",
+    windowOriginClassName: "origin-bottom-right"
+  },
+  "bottom-left": {
+    containerClassName: "bottom-1 left-1 md:bottom-6 md:left-6",
+    windowClassName: "bottom-15 sm:bottom-16 left-0",
+    windowOriginClassName: "origin-bottom-left"
+  },
+  "top-right": {
+    containerClassName: "top-1 right-1 md:top-6 md:right-6",
+    windowClassName: "top-15 sm:top-16 right-0",
+    windowOriginClassName: "origin-top-right"
+  },
+  "top-left": {
+    containerClassName: "top-1 left-1 md:top-6 md:left-6",
+    windowClassName: "top-15 sm:top-16 left-0",
+    windowOriginClassName: "origin-top-left"
+  },
+  "bottom-center": {
+    containerClassName: "bottom-1 left-1/2 -translate-x-1/2 md:bottom-6",
+    windowClassName: "bottom-15 sm:bottom-16 left-1/2 -translate-x-1/2",
+    windowOriginClassName: "origin-bottom"
+  },
+  "top-center": {
+    containerClassName: "top-1 left-1/2 -translate-x-1/2 md:top-6",
+    windowClassName: "top-15 sm:top-16 left-1/2 -translate-x-1/2",
+    windowOriginClassName: "origin-top"
+  },
+  "center-right": {
+    containerClassName: "top-1/2 right-1 -translate-y-1/2 md:right-6",
+    windowClassName: "top-1/2 right-15 sm:right-16 -translate-y-1/2",
+    windowOriginClassName: "origin-right"
+  },
+  "center-left": {
+    containerClassName: "top-1/2 left-1 -translate-y-1/2 md:left-6",
+    windowClassName: "top-1/2 left-15 sm:left-16 -translate-y-1/2",
+    windowOriginClassName: "origin-left"
+  },
+  "center": {
+    containerClassName: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    windowClassName: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    windowOriginClassName: "origin-center"
+  }
+};
+
+const DEFAULT_POSITION_PRESET: WidgetPositionPreset = "bottom-right";
+
 const mapApiMessage = (message: PublicChatApiMessage): Message => ({
   content: message.text,
   sender: message.type === "INPUT" ? "user" : "bot"
 });
 
+const toCssLength = (value: number | string | undefined): string | undefined => {
+  if (typeof value === "number") return `${value}px`;
+  if (typeof value === "string") return value;
+  return undefined;
+};
+
+const isWidgetPositionPreset = (value: unknown): value is WidgetPositionPreset => {
+  return typeof value === "string" && value in PRESET_LAYOUTS;
+};
+
 export default function ChatbotWidget({
   theme = 'boring',
   notificationBadge = true,
   openTriggerId,
+  position,
   greeting,
   pageContext,
   chatPrompts = [],
@@ -92,10 +181,91 @@ export default function ChatbotWidget({
   const [displayNotify, setDisplayNotify] = useState(notificationBadge)
   const normalizedOpenTriggerId = openTriggerId?.trim()
   const shouldRenderDefaultOpenButton = !normalizedOpenTriggerId
+  const [triggerWindowInlineStyle, setTriggerWindowInlineStyle] = useState<React.CSSProperties>()
+
+  const requestedPositionMode: WidgetPositionMode = position?.mode ?? "preset"
+  const hasCoordinates = position?.x !== undefined && position?.y !== undefined
+  const canUseTriggerMode = requestedPositionMode === "trigger" && Boolean(normalizedOpenTriggerId)
+  const effectivePositionMode: WidgetPositionMode = canUseTriggerMode
+    ? "trigger"
+    : requestedPositionMode === "coordinates" && hasCoordinates
+      ? "coordinates"
+      : "preset"
+
+  const resolvedPreset: WidgetPositionPreset = isWidgetPositionPreset(position?.preset)
+    ? position.preset
+    : DEFAULT_POSITION_PRESET
+
+  const presetLayout = PRESET_LAYOUTS[resolvedPreset]
+
+  const updateTriggerWindowPosition = useCallback((explicitTriggerElement?: HTMLElement | null) => {
+    if (effectivePositionMode !== "trigger") return;
+
+    const triggerElement = explicitTriggerElement ?? (
+      normalizedOpenTriggerId ? document.getElementById(normalizedOpenTriggerId) : null
+    );
+    if (!triggerElement) return;
+
+    const rect = triggerElement.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const sidePadding = 12;
+    const gap = position?.gap ?? 12;
+    const offsetX = position?.offsetX ?? 0;
+    const offsetY = position?.offsetY ?? 0;
+
+    const windowWidth = Math.min(384, viewportWidth - sidePadding * 2);
+    const windowHeight = Math.min(
+      Math.round(viewportHeight * 0.65),
+      viewportHeight - sidePadding * 2
+    );
+
+    const canFitRight = rect.right + gap + windowWidth + sidePadding <= viewportWidth;
+
+    let left = canFitRight
+      ? rect.right + gap + offsetX
+      : rect.left - windowWidth - gap + offsetX;
+
+    left = Math.min(
+      Math.max(sidePadding, left),
+      viewportWidth - windowWidth - sidePadding
+    );
+
+    let top = rect.top + (rect.height / 2) - (windowHeight / 2) + offsetY;
+
+    top = Math.min(
+      Math.max(sidePadding, top),
+      viewportHeight - windowHeight - sidePadding
+    );
+
+    setTriggerWindowInlineStyle({
+      left: `${left}px`,
+      top: `${top}px`,
+      width: `${windowWidth}px`,
+      bottom: "auto"
+    });
+  }, [
+    effectivePositionMode,
+    normalizedOpenTriggerId,
+    position?.gap,
+    position?.offsetX,
+    position?.offsetY
+  ]);
 
   // If this is a shitty Facebook browser, 
   // class fb-ios-webview set for the widget
   useFbIosWebviewClass();
+
+  useEffect(() => {
+    if (requestedPositionMode === "trigger" && !normalizedOpenTriggerId) {
+      console.warn(`[ChatbotWidget] "position.mode=trigger" requires "openTriggerId". Falling back to preset mode.`);
+    }
+
+    if (requestedPositionMode === "coordinates" && !hasCoordinates) {
+      console.warn(`[ChatbotWidget] "position.mode=coordinates" requires both "x" and "y". Falling back to preset mode.`);
+    }
+  }, [hasCoordinates, normalizedOpenTriggerId, requestedPositionMode]);
 
   useEffect(() => {
     if (!normalizedOpenTriggerId) return;
@@ -108,6 +278,9 @@ export default function ChatbotWidget({
       if (!triggerElement) return;
 
       if (triggerElement === target || triggerElement.contains(target)) {
+        if (effectivePositionMode === "trigger") {
+          updateTriggerWindowPosition(triggerElement);
+        }
         setIsOpen(true);
       }
     };
@@ -116,7 +289,24 @@ export default function ChatbotWidget({
     return () => {
       document.removeEventListener("click", handleTriggerClick);
     };
-  }, [normalizedOpenTriggerId]);
+  }, [effectivePositionMode, normalizedOpenTriggerId, updateTriggerWindowPosition]);
+
+  useEffect(() => {
+    if (effectivePositionMode !== "trigger" || !isOpen) return;
+
+    const handleViewportChange = () => {
+      updateTriggerWindowPosition();
+    };
+
+    handleViewportChange();
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("scroll", handleViewportChange, true);
+
+    return () => {
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("scroll", handleViewportChange, true);
+    };
+  }, [effectivePositionMode, isOpen, updateTriggerWindowPosition]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -228,16 +418,35 @@ export default function ChatbotWidget({
     }
   }
 
+  const widgetContainerClassName = effectivePositionMode === "coordinates"
+    ? "fixed z-50 ai-chatbot"
+    : `fixed z-50 ai-chatbot ${presetLayout.containerClassName}`
+
+  const widgetContainerInlineStyle: React.CSSProperties | undefined = effectivePositionMode === "coordinates"
+    ? {
+      left: toCssLength(position?.x),
+      top: toCssLength(position?.y)
+    }
+    : undefined
+
+  const chatWindowClassName = `
+    ${effectivePositionMode === "trigger" ? "fixed" : `absolute ${presetLayout.windowClassName} ${presetLayout.windowOriginClassName}`}
+    w-86 sm:w-96 h-[65vh] 
+    transform transition-all duration-300 ease-in-out
+    ai-chatbot-window
+    ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}
+  `
+
+  const chatWindowInlineStyle: React.CSSProperties | undefined = effectivePositionMode === "trigger"
+    ? triggerWindowInlineStyle ?? { right: "16px", bottom: "80px", top: "auto" }
+    : undefined
+
   return (
-    <div className="fixed bottom-1 right-1 md:bottom-6 md:right-6 z-50 ai-chatbot ">
+    <div className={widgetContainerClassName} style={widgetContainerInlineStyle}>
       {/* Chat Window */}
       <div
-        className={`
-        absolute bottom-15 sm:bottom-16 right-0 w-86 sm:w-96 h-[65vh] 
-        transform transition-all duration-300 ease-in-out origin-bottom-right
-        ai-chatbot-window
-        ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"}
-      `}
+        className={chatWindowClassName}
+        style={chatWindowInlineStyle}
       >
         <div className={`${getStyle(theme, 'mainBackground')} rounded-4xl shadow-2xl backdrop-blur-xl h-full flex flex-col overflow-hidden`}>
           {/* Header */}

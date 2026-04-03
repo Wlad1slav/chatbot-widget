@@ -48,7 +48,7 @@ The widget uses the same URL for both read/send operations and sends requests wi
 ```json
 {
   "data": {
-    "sessionUuid": "uuid", // not used now
+    "sessionUuid": "uuid",
     "createdAt": "ISO date",
     "messages": [
       {
@@ -79,7 +79,7 @@ The widget uses the same URL for both read/send operations and sends requests wi
 ```json
 {
   "data": {
-    "sessionUuid": "uuid", // not used now
+    "sessionUuid": "uuid",
     "input": {},
     "output": {
       "text": "Bot reply"

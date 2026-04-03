@@ -17,11 +17,12 @@ Last update: **April 3, 2026**.
 - [buzzcrafts.art](https://buzzcrafts.art/) - Gift store centered on anniversary gifts by year and milestone-based present ideas.
 
 ## Features
-- [x] Theme customization – the theme parameter applies predefined styles that change the background, button, and message-bubble colors.
+- [x] Token-based theming (`theme` presets + `themeTokens` overrides + CSS variables).
 - [x] Animated popup window – the chat window is anchored to the bottom-right corner and opens/collapses with smooth animation.
 - [x] Open button + message badge
 - [x] External open trigger by element `id`
 - [x] Flexible widget positioning (screen presets, fixed coordinates, or near trigger)
+- [x] Style isolation by default (Shadow DOM mount) to avoid host CSS collisions.
 - [x] Welcome message
 - [x] Previous dialogue restoration
 - [x] Quick-reply prompts (chat prompts)
@@ -103,7 +104,6 @@ Minimal required CORS headers in API response:
 ```html
 <head>
     <!-- ... -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@latest/dist/index.css" />
 </head>
 
 <body>
@@ -134,6 +134,15 @@ Thank you for reaching out! 💬`
             apiBaseUrl: 'https://api.example.com',
             greeting,
             chatPrompts,
+            theme: {
+                preset: 'boring',
+                tokens: {
+                    headerBackground: 'linear-gradient(90deg, #0f172a, #1e293b)',
+                    openButtonBackground: '#0f172a',
+                    openButtonColor: '#ffffff',
+                    badgeBackground: '#f97316'
+                }
+            },
             openTriggerId: 'open-chatbot-btn', // optional: use your own trigger element
             position: {
                 mode: 'trigger' // opens the chat near the openTriggerId element
@@ -157,9 +166,38 @@ Thank you for reaching out! 💬`
                     }
                 }
             },
+            themeTokens: {
+                promptBackground: 'rgba(15, 23, 42, 0.9)'
+            }
+        }, {
+            // default is true
+            isolateStyles: true
         });
     </script>
 </body>
+```
+
+### Style isolation (default)
+
+`mountChatbotWidget(..., ..., { isolateStyles: true })` is the default behavior.
+
+In this mode, the widget is rendered inside a Shadow DOM root:
+
+- global host-site CSS does not accidentally override widget styles;
+- widget CSS does not leak and override unrelated site elements.
+
+If you intentionally want regular DOM styling (for example, global overrides from your stylesheet), pass:
+
+```typescript
+ChatbotWidget.mountChatbotWidget('#chatbot', props, {
+  isolateStyles: false
+})
+```
+
+When `isolateStyles: false`, include widget CSS manually:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@latest/dist/index.css" />
 ```
 
 ### Custom open trigger
@@ -239,11 +277,41 @@ messageInputPosition?: 'bottom' | 'top'
 
 ### Themes
 
-Avaible themes: `futuristic`, `lighty`, `boring`, `o Canada`.
+Available presets: `futuristic`, `lighty`, `boring`, `o Canada`.
 
-The themes are stylized using tailwind, you can see them here: `/widget-vite/src/utils/styles.ts`.
+You can pass `theme` as:
 
-There is currently no solution for creating custom themes by passing props. If needed, you can use plain CSS with the !important directive.
+- a preset string:
+
+```typescript
+theme: 'futuristic'
+```
+
+- or a config object with preset + token overrides:
+
+```typescript
+theme: {
+  preset: 'boring',
+  tokens: {
+    headerBackground: 'linear-gradient(90deg, #1f2937, #111827)',
+    botMessageBackground: '#111827',
+    botMessageTextColor: '#ffffff',
+    openButtonBackground: '#111827',
+    badgeBackground: '#22c55e'
+  }
+}
+```
+
+Additionally, `themeTokens` can override tokens on top of `theme`:
+
+```typescript
+themeTokens: {
+  promptBackground: 'rgba(17, 24, 39, 0.92)',
+  promptTextColor: '#ffffff'
+}
+```
+
+The widget uses CSS variables internally (`--ai-chatbot-*`), so you can also apply intentional host-level overrides by setting these variables on the mount target.
 
 #### lighty
 

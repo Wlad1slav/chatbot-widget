@@ -1,9 +1,6 @@
-import { getStyle } from "../utils/styles";
-import type { Theme } from "../utils/types";
-
-export default function NotificationBadge({theme}: {theme: Theme}) {
+export default function NotificationBadge() {
     return (
-        <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center animate-pulse ${getStyle(theme, "notifyBadge")}`}>
+        <div className="ai-chatbot__badge absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center animate-pulse">
           <span className="text-xs font-bold">1</span>
         </div>
     )

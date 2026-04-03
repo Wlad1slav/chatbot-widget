@@ -4,10 +4,10 @@ import { useMemo, useState, useRef, useEffect, useCallback } from "react"
 
 import "./widget.css"
 import ChatbotHeader from "./components/chatbot-header"
-import type { Message, Theme } from "./utils/types"
+import type { Message, ThemeInput, ThemeTokens } from "./utils/types"
 import ChatbotMessage from "./components/chatbot-message"
 import TypingIndicator from "./components/typing-indicator"
-import { getStyle } from "./utils/styles"
+import { resolveThemeTokens, toThemeCssVariables } from "./utils/styles"
 import NotificationBadge from "./components/notification-badge"
 import ChatbotInput from "./components/chatbot-input"
 import ChatbotOpenButton from "./components/chatbot-open-btn"
@@ -62,7 +62,8 @@ export type WidgetPosition = {
 export type MessageInputPosition = "bottom" | "top";
 
 export type ChatbotWidgetProps = {
-  theme?: Theme,
+  theme?: ThemeInput,
+  themeTokens?: Partial<ThemeTokens>,
   notificationBadge?: boolean,
   openTriggerId?: string,
   position?: WidgetPosition,
@@ -156,6 +157,7 @@ const isWidgetPositionPreset = (value: unknown): value is WidgetPositionPreset =
 
 export default function ChatbotWidget({
   theme = 'boring',
+  themeTokens,
   notificationBadge = true,
   openTriggerId,
   position,
@@ -201,6 +203,14 @@ export default function ChatbotWidget({
     : DEFAULT_POSITION_PRESET
 
   const presetLayout = PRESET_LAYOUTS[resolvedPreset]
+  const resolvedTheme = useMemo(
+    () => resolveThemeTokens(theme, themeTokens),
+    [theme, themeTokens]
+  );
+  const themeCssVariables = useMemo(
+    () => toThemeCssVariables(resolvedTheme),
+    [resolvedTheme]
+  );
 
   const updateTriggerWindowPosition = useCallback((explicitTriggerElement?: HTMLElement | null) => {
     if (effectivePositionMode !== "trigger") return;
@@ -447,15 +457,18 @@ export default function ChatbotWidget({
   }
 
   const widgetContainerClassName = effectivePositionMode === "coordinates"
-    ? "fixed z-50 ai-chatbot"
-    : `fixed z-50 ai-chatbot ${presetLayout.containerClassName}`
+    ? "fixed z-50 ai-chatbot ai-chatbot-root"
+    : `fixed z-50 ai-chatbot ai-chatbot-root ${presetLayout.containerClassName}`
 
-  const widgetContainerInlineStyle: React.CSSProperties | undefined = effectivePositionMode === "coordinates"
-    ? {
-      left: toCssLength(position?.x),
-      top: toCssLength(position?.y)
-    }
-    : undefined
+  const widgetContainerInlineStyle: React.CSSProperties = {
+    ...(effectivePositionMode === "coordinates"
+      ? {
+        left: toCssLength(position?.x),
+        top: toCssLength(position?.y)
+      }
+      : {}),
+    ...themeCssVariables
+  };
 
   const chatWindowClassName = `
     ${effectivePositionMode === "trigger" ? "fixed" : `absolute ${presetLayout.windowClassName} ${presetLayout.windowOriginClassName}`}
@@ -469,22 +482,16 @@ export default function ChatbotWidget({
     ? triggerWindowInlineStyle ?? { right: "16px", bottom: "80px", top: "auto" }
     : undefined
 
-  const chatSurfaceInlineStyle: React.CSSProperties | undefined = messageInputPosition === "top"
-    ? {
-      boxShadow: "0 -25px 50px -12px rgb(0 0 0 / 0.25)"
-    }
-    : undefined;
-
   const orderedMessages = messageInputPosition === "top"
     ? messages.map((message, index) => ({ message, index })).reverse()
     : messages.map((message, index) => ({ message, index }));
 
   const header = (
-    <ChatbotHeader setIsOpen={setIsOpen} theme={theme} title={title} imageUrl={imageUrl} imageWidth={imageWidth} />
+    <ChatbotHeader setIsOpen={setIsOpen} title={title} imageUrl={imageUrl} imageWidth={imageWidth} />
   );
 
   const input = (
-    <ChatbotInput handleKeyPress={handleKeyPress} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={() => handleSendMessage()} theme={theme} />
+    <ChatbotInput handleKeyPress={handleKeyPress} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={() => handleSendMessage()} />
   );
 
   return (
@@ -495,15 +502,14 @@ export default function ChatbotWidget({
         style={chatWindowInlineStyle}
       >
         <div
-          className={`${getStyle(theme, 'mainBackground')} rounded-4xl shadow-2xl backdrop-blur-xl h-full flex flex-col overflow-hidden`}
-          style={chatSurfaceInlineStyle}
+          className={`ai-chatbot-window-surface rounded-4xl shadow-2xl backdrop-blur-xl h-full flex flex-col overflow-hidden ${messageInputPosition === "top" ? "ai-chatbot-window-surface--input-top" : ""}`}
         >
           {messageInputPosition === "top" ? input : header}
 
           {/* Messages */}
           <div
             ref={messagesContainerRef}
-            className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent"
+            className="ai-chatbot__messages flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4"
           >
             <div className="space-y-4 ">
               {isTyping && messageInputPosition === "top" && (
@@ -511,7 +517,7 @@ export default function ChatbotWidget({
               )}
 
               {orderedMessages.map(({ message, index }, orderIndex) => (
-                <ChatbotMessage key={`${message.sender}-${index}`} message={message} index={orderIndex} theme={theme} />
+                <ChatbotMessage key={`${message.sender}-${index}`} message={message} index={orderIndex} />
               ))}
 
               {/* Typing Indicator */}
@@ -523,7 +529,7 @@ export default function ChatbotWidget({
             {/* Prompts, suggestions */}
             {showPrompts && <div className="flex gap-2 flex-wrap">
               {prompts.map(prompt => (
-                <ChatbotPrompt key={prompt} prompt={prompt} handleSendMessage={handleSendMessage} theme={theme} />
+                <ChatbotPrompt key={prompt} prompt={prompt} handleSendMessage={handleSendMessage} />
               ))}
             </div>}
           </div>
@@ -537,16 +543,16 @@ export default function ChatbotWidget({
           <ChatbotMessage message={{
             content: greeting,
             sender: 'bot'
-          }} index={0} theme={theme} margin={false} />
+          }} index={0} margin={false} />
         </div>
       )}
 
       {/* Chat Button */}
       {shouldRenderDefaultOpenButton && (
-        <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} theme={theme} />
+        <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} />
       )}
 
-      {(shouldRenderDefaultOpenButton && !isOpen && displayNotify && !greetingOutside) && (<NotificationBadge theme={theme} />)}
+      {(shouldRenderDefaultOpenButton && !isOpen && displayNotify && !greetingOutside) && (<NotificationBadge />)}
     </div>
   )
 }

@@ -8,6 +8,7 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 - [x] Theme customization – the theme parameter applies predefined styles that change the background, button, and message-bubble colors.
 - [x] Animated popup window – the chat window is anchored to the bottom-right corner and opens/collapses with smooth animation.
 - [x] Open button + message badge
+- [x] External open trigger by element `id`
 - [x] Welcome message
 - [x] Previous dialogue restoration
 - [x] Quick-reply prompts (chat prompts)
@@ -94,6 +95,7 @@ Minimal required CORS headers in API response:
 <body>
     <!-- ... -->
 
+    <button id="open-chatbot-btn">Open chat</button>
     <div id="chatbot"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/ai-chatbot-widget@latest/dist/chatbot-widget.iife.js"></script>
@@ -118,6 +120,7 @@ Thank you for reaching out! 💬`
             apiBaseUrl: 'https://api.example.com',
             greeting,
             chatPrompts,
+            openTriggerId: 'open-chatbot-btn', // optional: use your own trigger element
 
             title: 'Bsign Assistant',
             imageUrl: 'https://cdn.shopify.com/s/files/1/0248/8198/7665/files/chatbot-logo.png?v=1750682293',
@@ -140,6 +143,12 @@ Thank you for reaching out! 💬`
     </script>
 </body>
 ```
+
+### Custom open trigger
+
+If `openTriggerId` is provided, the widget listens for clicks on that element and opens the dialog.
+
+When this prop is used, the built-in floating open button and notification badge are not rendered.
 
 ### Themes
 

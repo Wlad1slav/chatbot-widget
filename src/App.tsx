@@ -4,6 +4,7 @@ function App() {
 
   return (
     <>
+      <button id="open-chatbot-btn">Open chat</button>
       <ChatbotWidget
         apiBaseUrl={import.meta.env.VITE_TEST_API_BASE_URL}
         theme='boring'
@@ -14,6 +15,7 @@ function App() {
           }
         }}
         chatPrompts={['Hello', 'About us', 'Help me']}
+        openTriggerId='open-chatbot-btn'
       />
     </>
   )

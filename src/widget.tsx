@@ -39,6 +39,7 @@ export type WidgetContext = {
 export type ChatbotWidgetProps = {
   theme?: Theme,
   notificationBadge?: boolean,
+  openTriggerId?: string,
 
   // Function to execute depending on the page the user is on
   // Context contains all methods for working with the widget context
@@ -65,6 +66,7 @@ const mapApiMessage = (message: PublicChatApiMessage): Message => ({
 export default function ChatbotWidget({
   theme = 'boring',
   notificationBadge = true,
+  openTriggerId,
   greeting,
   pageContext,
   chatPrompts = [],
@@ -88,10 +90,33 @@ export default function ChatbotWidget({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [prompts, setPrompts] = useState<string[]>(chatPrompts)
   const [displayNotify, setDisplayNotify] = useState(notificationBadge)
+  const normalizedOpenTriggerId = openTriggerId?.trim()
+  const shouldRenderDefaultOpenButton = !normalizedOpenTriggerId
 
   // If this is a shitty Facebook browser, 
   // class fb-ios-webview set for the widget
   useFbIosWebviewClass();
+
+  useEffect(() => {
+    if (!normalizedOpenTriggerId) return;
+
+    const handleTriggerClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const triggerElement = document.getElementById(normalizedOpenTriggerId);
+      if (!triggerElement) return;
+
+      if (triggerElement === target || triggerElement.contains(target)) {
+        setIsOpen(true);
+      }
+    };
+
+    document.addEventListener("click", handleTriggerClick);
+    return () => {
+      document.removeEventListener("click", handleTriggerClick);
+    };
+  }, [normalizedOpenTriggerId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -255,9 +280,11 @@ export default function ChatbotWidget({
       )}
 
       {/* Chat Button */}
-      <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} theme={theme} />
+      {shouldRenderDefaultOpenButton && (
+        <ChatbotOpenButton isOpen={isOpen} setIsOpen={setIsOpen} theme={theme} />
+      )}
 
-      {(!isOpen && displayNotify && !greetingOutside) && (<NotificationBadge theme={theme} />)}
+      {(shouldRenderDefaultOpenButton && !isOpen && displayNotify && !greetingOutside) && (<NotificationBadge theme={theme} />)}
     </div>
   )
 }

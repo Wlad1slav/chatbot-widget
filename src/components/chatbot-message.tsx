@@ -1,15 +1,27 @@
 import { Bot, User } from "lucide-react";
 import type { Message, Theme } from "../utils/types";
 import { getStyle } from "../utils/styles";
-import { marked } from 'marked';
 import { useMemo } from "react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 export default function ChatbotMessage({ message, index, theme, margin=true }: { message: Message, index: number, theme: Theme, margin?: boolean }) {
 
-    const html = useMemo(() => marked(message.content.replaceAll('```', ''), { 
-        gfm: true, 
-        breaks: true 
-      }), [message.content]);
+    const html = useMemo(() => {
+        const rawHtml = marked.parse(message.content.replaceAll("```", ""), {
+            gfm: true,
+            breaks: true
+        });
+
+        // marked may return a Promise in async mode; render safe empty content in that edge case.
+        if (typeof rawHtml !== "string") {
+            return "";
+        }
+
+        return DOMPurify.sanitize(rawHtml, {
+            USE_PROFILES: { html: true }
+        });
+    }, [message.content]);
 
     return (
         <div

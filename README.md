@@ -16,6 +16,7 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 - [x] Page context (pageContext) – lets you run arbitrary scripts (e.g., auto-show the chat or display a personalized message) once a visitor has spent timer ms on a specific pathname.
 - [x] Full control via context object – the execPageContext function provides external code with a complete set of setters (open, messageOptions, input, promptsOptions) plus a scrollToBottom method, simplifying integration with analytics or business logic.
 - [x] Input with Shift+Enter support – pressing Enter sends a message; Shift+Enter inserts a newline.
+- [x] Configurable input position - place input on top and header on bottom with props.
 - [x] Automatic scroll to the latest message
 - [x] Responsive design
 - [ ] Full-page context handling – ability to send the entire page context to the server along with the user’s message.
@@ -125,6 +126,7 @@ Thank you for reaching out! 💬`
             position: {
                 mode: 'trigger' // opens the chat near the openTriggerId element
             },
+            messageInputPosition: 'top', // optional: top input + bottom header + newest messages on top
 
             title: 'Bsign Assistant',
             imageUrl: 'https://cdn.shopify.com/s/files/1/0248/8198/7665/files/chatbot-logo.png?v=1750682293',
@@ -211,6 +213,17 @@ position: {
   offsetY: -20
 }
 ```
+
+### Input position
+
+Use `messageInputPosition` to control where the input lives.
+
+```typescript
+messageInputPosition?: 'bottom' | 'top'
+```
+
+- `'bottom'` (default): header is on top, input is on bottom, newest messages appear at the bottom.
+- `'top'`: input is on top, header moves to bottom, newest messages appear at the top.
 
 ### Themes
 

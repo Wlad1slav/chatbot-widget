@@ -59,11 +59,14 @@ export type WidgetPosition = {
   offsetY?: number;
 };
 
+export type MessageInputPosition = "bottom" | "top";
+
 export type ChatbotWidgetProps = {
   theme?: Theme,
   notificationBadge?: boolean,
   openTriggerId?: string,
   position?: WidgetPosition,
+  messageInputPosition?: MessageInputPosition;
 
   // Function to execute depending on the page the user is on
   // Context contains all methods for working with the widget context
@@ -156,6 +159,7 @@ export default function ChatbotWidget({
   notificationBadge = true,
   openTriggerId,
   position,
+  messageInputPosition = "bottom",
   greeting,
   pageContext,
   chatPrompts = [],
@@ -176,7 +180,7 @@ export default function ChatbotWidget({
   const [isTyping, setIsTyping] = useState(false)
   const [showPrompts, setShowPrompts] = useState(true)
   const [isDialogLoaded, setIsDialogLoaded] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [prompts, setPrompts] = useState<string[]>(chatPrompts)
   const [displayNotify, setDisplayNotify] = useState(notificationBadge)
   const normalizedOpenTriggerId = openTriggerId?.trim()
@@ -308,9 +312,33 @@ export default function ChatbotWidget({
     };
   }, [effectivePositionMode, isOpen, updateTriggerWindowPosition]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+  const scrollToBottom = useCallback(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (!messagesContainer) return;
+
+    messagesContainer.scrollTo({
+      top: messagesContainer.scrollHeight,
+      behavior: "smooth"
+    });
+  }, []);
+
+  const scrollToLatestMessage = useCallback(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (!messagesContainer) return;
+
+    if (messageInputPosition === "top") {
+      messagesContainer.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+      return;
+    }
+
+    messagesContainer.scrollTo({
+      top: messagesContainer.scrollHeight,
+      behavior: "smooth"
+    });
+  }, [messageInputPosition]);
 
   // trigger for new messages
   useEffect(() => {
@@ -319,8 +347,8 @@ export default function ChatbotWidget({
     if (countUserMessages.length > 0) setShowPrompts(false);
     else setShowPrompts(true);
 
-    scrollToBottom()
-  }, [messages])
+    scrollToLatestMessage()
+  }, [messages, scrollToLatestMessage])
 
   useEffect(() => {
     setMessages(greeting ? [{ content: greeting, sender: 'bot' }] : []);
@@ -441,6 +469,24 @@ export default function ChatbotWidget({
     ? triggerWindowInlineStyle ?? { right: "16px", bottom: "80px", top: "auto" }
     : undefined
 
+  const chatSurfaceInlineStyle: React.CSSProperties | undefined = messageInputPosition === "top"
+    ? {
+      boxShadow: "0 -25px 50px -12px rgb(0 0 0 / 0.25)"
+    }
+    : undefined;
+
+  const orderedMessages = messageInputPosition === "top"
+    ? messages.map((message, index) => ({ message, index })).reverse()
+    : messages.map((message, index) => ({ message, index }));
+
+  const header = (
+    <ChatbotHeader setIsOpen={setIsOpen} theme={theme} title={title} imageUrl={imageUrl} imageWidth={imageWidth} />
+  );
+
+  const input = (
+    <ChatbotInput handleKeyPress={handleKeyPress} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={() => handleSendMessage()} theme={theme} />
+  );
+
   return (
     <div className={widgetContainerClassName} style={widgetContainerInlineStyle}>
       {/* Chat Window */}
@@ -448,22 +494,30 @@ export default function ChatbotWidget({
         className={chatWindowClassName}
         style={chatWindowInlineStyle}
       >
-        <div className={`${getStyle(theme, 'mainBackground')} rounded-4xl shadow-2xl backdrop-blur-xl h-full flex flex-col overflow-hidden`}>
-          {/* Header */}
-          <ChatbotHeader setIsOpen={setIsOpen} theme={theme} title={title} imageUrl={imageUrl} imageWidth={imageWidth} />
+        <div
+          className={`${getStyle(theme, 'mainBackground')} rounded-4xl shadow-2xl backdrop-blur-xl h-full flex flex-col overflow-hidden`}
+          style={chatSurfaceInlineStyle}
+        >
+          {messageInputPosition === "top" ? input : header}
 
           {/* Messages */}
-          <div className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 flex flex-col h-full justify-between overflow-y-auto p-2 lg:p-4 space-y-2 lg:space-y-4 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent"
+          >
             <div className="space-y-4 ">
-              {messages.map((message, index) => (
-                <ChatbotMessage key={`${message.sender}-${index}`} message={message} index={index} theme={theme} />
+              {isTyping && messageInputPosition === "top" && (
+                <TypingIndicator />
+              )}
+
+              {orderedMessages.map(({ message, index }, orderIndex) => (
+                <ChatbotMessage key={`${message.sender}-${index}`} message={message} index={orderIndex} theme={theme} />
               ))}
 
               {/* Typing Indicator */}
-              {isTyping && (
+              {isTyping && messageInputPosition === "bottom" && (
                 <TypingIndicator />
               )}
-              <div ref={messagesEndRef} />
 
             </div>
             {/* Prompts, suggestions */}
@@ -474,8 +528,7 @@ export default function ChatbotWidget({
             </div>}
           </div>
 
-          {/* Input */}
-          <ChatbotInput handleKeyPress={handleKeyPress} inputValue={inputValue} setInputValue={setInputValue} handleSendMessage={() => handleSendMessage()} theme={theme} />
+          {messageInputPosition === "top" ? header : input}
         </div>
       </div>
 

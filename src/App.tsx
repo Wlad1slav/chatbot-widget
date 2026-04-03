@@ -23,6 +23,7 @@ function App() {
           offsetX: -240,
           offsetY: 320
         }}
+        messageInputPosition='top'
       />
     </>
   )

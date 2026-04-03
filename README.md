@@ -4,6 +4,18 @@ This chatbot widget was developed for [Agile Alpaca](https://agile-alpaca.com) c
 
 ![preview](https://github.com/user-attachments/assets/998e8caa-0bb5-430e-b906-e9a77cc928e1)
 
+## Stores Using This Widget
+
+Last update: **April 3, 2026**.
+
+- [bsign-store.com](https://bsign-store.com/) - Manufacturer of custom door signs and modern door numbers made from metal, wood, and acrylic for homes, offices, apartments, and hotels.
+- [bsign-store.com.ua](https://bsign-store.com.ua/) - Ukrainian storefront of BSign focused on interior door signs and room numbers for homes, offices, and hospitality spaces.
+- [lemap.co](https://lemap.co/) - Store focused on travel-themed wall maps, especially national park maps and related decor/sign products.
+- [dfadecor.com](https://dfadecor.com/) - Interior decor shop with reusable wall stencils, mirror strips, and imprint tools for decorative wall finishing.
+- [evenwood.com.ua](https://evenwood.com.ua/) - Ukrainian handmade wooden decor and home-organization products, including planters, shelves, and shoe storage.
+- [ndukraine.com](https://ndukraine.com/) - Ukrainian goods store selling embroidered clothing, accessories, and home decor with handmade focus.
+- [buzzcrafts.art](https://buzzcrafts.art/) - Gift store centered on anniversary gifts by year and milestone-based present ideas.
+
 ## Features
 - [x] Theme customization – the theme parameter applies predefined styles that change the background, button, and message-bubble colors.
 - [x] Animated popup window – the chat window is anchored to the bottom-right corner and opens/collapses with smooth animation.

@@ -117,12 +117,18 @@
 }
 
 .widget-header__close {
-  background: var(--ai-chatbot-close-button-color);
+  color: var(--ai-chatbot-close-button-color);
+}
+
+.widget-header__close svg,
+.widget-header__close svg * {
+  color: var(--ai-chatbot-close-button-color);
+  stroke: currentColor;
   cursor: pointer;
 }
 
 .widget-header__close:hover {
-  background: var(--ai-chatbot-close-button-hover-bg);
+  background-color: var(--ai-chatbot-close-button-hover-bg);
 }
 
 .ai-chatbot__messages {

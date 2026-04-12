@@ -4,7 +4,12 @@ import widgetStyles from "./widget.css?inline";
 
 const widgetRoots = new WeakMap<HTMLElement, Root>();
 const STYLE_NODE_ID = "ai-chatbot-widget-style";
+const CUSTOM_STYLE_NODE_ID = "ai-chatbot-widget-custom-style";
 const APP_NODE_ID = "ai-chatbot-widget-root";
+
+export type MountChatbotWidgetOptions = {
+    styles?: string | string[];
+};
 
 const resolveHost = (target: string | HTMLElement): HTMLElement => {
     if (typeof target === "string") {
@@ -42,6 +47,43 @@ const ensureStyleNode = (shadowRoot: ShadowRoot): void => {
     }
 }
 
+const normalizeStyles = (styles?: string | string[]): string => {
+    if (!styles) return "";
+
+    const styleList = Array.isArray(styles) ? styles : [styles];
+
+    return styleList
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .join("\n");
+}
+
+const ensureCustomStyleNode = (shadowRoot: ShadowRoot, styles?: string | string[]): void => {
+    const customStyles = normalizeStyles(styles);
+    let customStyleNode = shadowRoot.getElementById(CUSTOM_STYLE_NODE_ID) as HTMLStyleElement | null;
+
+    if (!customStyles) {
+        if (customStyleNode) customStyleNode.remove();
+        return;
+    }
+
+    if (!customStyleNode) {
+        customStyleNode = document.createElement("style");
+        customStyleNode.id = CUSTOM_STYLE_NODE_ID;
+        shadowRoot.append(customStyleNode);
+    }
+
+    const defaultStyleNode = shadowRoot.getElementById(STYLE_NODE_ID);
+
+    if (defaultStyleNode && customStyleNode.previousElementSibling !== defaultStyleNode) {
+        defaultStyleNode.after(customStyleNode);
+    }
+
+    if (customStyleNode.textContent !== customStyles) {
+        customStyleNode.textContent = customStyles;
+    }
+}
+
 const ensureAppNode = (shadowRoot: ShadowRoot): HTMLDivElement => {
     let appNode = shadowRoot.getElementById(APP_NODE_ID) as HTMLDivElement | null;
 
@@ -56,12 +98,14 @@ const ensureAppNode = (shadowRoot: ShadowRoot): HTMLDivElement => {
 
 export function mountChatbotWidget(
     target: string | HTMLElement,
-    props: Record<string, unknown> = {}
+    props: Record<string, unknown> = {},
+    options: MountChatbotWidgetOptions = {}
 ) {
     const host = resolveHost(target);
     const shadowRoot = ensureShadowRoot(host);
 
     ensureStyleNode(shadowRoot);
+    ensureCustomStyleNode(shadowRoot, options.styles);
     const appNode = ensureAppNode(shadowRoot);
 
     let root = widgetRoots.get(host);

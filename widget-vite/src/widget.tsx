@@ -2,7 +2,6 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 
-import "./widget.css"
 import ChatbotHeader from "./components/chatbot-header"
 import type { Message, Theme } from "./utils/types"
 import ChatbotMessage from "./components/chatbot-message"
@@ -68,9 +67,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   const [prompts, setPrompts] = useState<string[]>(chatPrompts)
   const [displayNotify, setDisplayNotify] = useState(notificationBadge)
 
-  // If this is a shitty Facebook browser, 
-  // class fb-ios-webview set for the widget
-  useFbIosWebviewClass();
+  const isFbIosWebview = useFbIosWebviewClass();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -133,7 +130,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
 
   const handleSendMessage = async (customeInput?: string) => {
     // if (input) setInputValue(input)
-    let input = customeInput ? customeInput : inputValue.trim();
+    const input = customeInput ? customeInput : inputValue.trim();
     if (!input) return
 
     // add user message
@@ -154,7 +151,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
         sender: "bot",
       }
       setMessages((prev) => [...prev, botResponse])
-    } catch (e) {
+    } catch {
       const errorMessage: Message = {
         content:
           "Unfortunately, an error occurred while processing your request.",
@@ -175,7 +172,7 @@ export default function ChatbotWidget({ theme = 'boring', notificationBadge = tr
   }
 
   return (
-    <div className="fixed bottom-1 right-1 md:bottom-6 md:right-6 z-50 ai-chatbot ">
+    <div className={`fixed bottom-1 right-1 md:bottom-6 md:right-6 z-50 ai-chatbot ${isFbIosWebview ? 'fb-ios-webview' : ''}`}>
       {/* Chat Window */}
       <div
         className={`
